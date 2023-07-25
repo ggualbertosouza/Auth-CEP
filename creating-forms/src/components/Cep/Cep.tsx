@@ -2,6 +2,9 @@ import { useForm } from "react-hook-form";
 import { CepStyle } from "./style";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from 'axios'
+import { useCallback, useEffect } from "react";
+import {zipCodeMask} from 'constants/masks'
 
 const schemaForm = z.object({
   address: z.object({
@@ -11,15 +14,34 @@ const schemaForm = z.object({
     district: z.string().min(1, "Informe um bairro válido."),
     street: z.string().min(1, "Informa uma rua válida."),
     complement: z.string(),
-  }),
+  })
+}).transform((field)=>{
+  address: {
+    zipCode: field.address.zipCode;
+    state: field.address.state;
+    city: field.address.city;
+    district: field.address.district;
+    street: field.address.street;
+    complement: field.address.complement;
+  }
 });
 
 type FormProps = z.infer<typeof schemaForm>;
+
+type AddressProps = {
+    uf: string;
+    localidade: string;
+    bairro: string;
+    logradouro: string;
+    complemento: string;
+}
 
 export default function Cep() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<FormProps>({
     criteriaMode: "all",
@@ -37,9 +59,38 @@ export default function Cep() {
     },
   });
 
+  const zipCode = watch('address.zipCode')
+
   const handleFormSubmit = (data: FormProps) => {
     console.log(data);
   };
+
+
+  const setData = useCallback((data: AddressProps)=> {
+    setValue('address.city', data.localidade)
+    setValue('address.street', data.logradouro)
+    setValue('address.state', data.uf)
+    setValue('address.district', data.bairro)
+    setValue('address.complement', data.complemento)
+  },[setValue]) 
+
+  const fetchAdress = useCallback(async (zipCode: string)=>{
+    const { data } = await axios.get(
+      `https://viacep.com.br/ws/${zipCode}/json/`
+      );
+
+    setData(data)
+  }, [setData])
+
+
+    useEffect(()=> {
+      setValue('address.zipCode', zipCodeMask(zipCode))
+
+      if(zipCode.length != 9) return;
+
+      fetchAdress(zipCode)
+      console.log()
+    }, [fetchAdress, setValue, zipCode])
 
   return (
     <CepStyle>
@@ -103,3 +154,5 @@ export default function Cep() {
     </CepStyle>
   );
 }
+
+

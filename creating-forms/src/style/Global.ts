@@ -1,7 +1,4 @@
 import { createGlobalStyle } from 'styled-components'
-
-import { theme } from './Theme'
-
 export const GlobalStyle = createGlobalStyle`
     *{
         margin: 0;
@@ -13,8 +10,8 @@ export const GlobalStyle = createGlobalStyle`
         font-size: 62.5%;
     }
     body{
-        width: 100vw;
+        width: 100%;
         height: 100vh;
-        background-color: ${theme.colors.gray};
+        background-color: #121212;
     }
 `

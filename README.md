@@ -7,7 +7,7 @@
 ## Tecnologias usadas
 <p>
   <a href="https://skillicons.dev">
-    <img src="https://skillicons.dev/icons?i=typescript,react,vite" />
+    <img src="https://skillicons.dev/icons?i=typescript,react,vite,html,css" />
   </a>
 </p>
 
